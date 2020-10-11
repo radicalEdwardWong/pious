@@ -1,33 +1,9 @@
-/******************************************************************************
-*	systemTimer.s
-*	 by Alex Chadwick
-*
-*	A sample assembly code implementation of the input02 operating system.
-*	See main.s for details.
-*
-*	systemTime.s contains the code that interacts with the system timer.
-******************************************************************************/
 
-/*
-* The system timer runs at 1MHz, and just counts always. Thus we can deduce
-* timings by measuring the difference between two readings.
-*/
-
-/*
-* GetSystemTimerBase returns the base address of the System Timer region as a
-* physical address in register r0.
-* C++ Signature: void* GetSystemTimerBase()
-*/
 .globl GetSystemTimerBase
 GetSystemTimerBase: 
 	ldr r0,=0x20003000
 	mov pc,lr
 
-/*
-* GetTimeStamp gets the current timestamp of the system timer, and returns it
-* in registers r0 and r1, with r1 being the most significant 32 bits.
-* C++ Signature: u64 GetTimeStamp()
-*/
 .globl GetTimeStamp
 GetTimeStamp:
 	push {lr}
@@ -36,9 +12,9 @@ GetTimeStamp:
 	pop {pc}
 
 /*
-* Wait waits at least a specified number of microseconds before returning.
-* The duration to wait is given in r0.
-* C++ Signature: void Wait(u32 delayInMicroSeconds)
+* Wait busywaits a specified number of microseconds before returning.
+* r0: The duration to wait
+* C++: void Wait(u32 delayInMicroSeconds)
 */
 .globl Wait
 Wait:
@@ -53,9 +29,9 @@ Wait:
 		bl GetTimeStamp
 		elapsed .req r1
 		sub elapsed,r0,start
-		cmp elapsed,delay
+		cmp delay,elapsed
 		.unreq elapsed
-		bls loop$
+		bhi loop$
 		
 	.unreq delay
 	.unreq start
