@@ -75,12 +75,17 @@ SetGpio:
 	lsl pinBank,#2
 	add gpioAddr,pinBank
 	.unreq pinBank
+	.unreq pinNum
+
+	/* gpioAddr = 0x20200000 if pin# = 0-31
+				  0x20200004 if pin# = 32-53 */
 	
-	and pinNum,#31
+	pinNumOffset .req r2
+	and pinNumOffset,#0b11111
 	setBit .req r3
 	mov setBit,#1
-	lsl setBit,pinNum
-	.unreq pinNum
+	lsl setBit,pinNumOffset
+	.unreq pinNumOffset
 	
 	teq pinVal,#0
 	.unreq pinVal
