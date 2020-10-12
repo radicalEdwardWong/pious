@@ -17,6 +17,7 @@ MailboxRead:
 
 	and channel,r0,#0xf
 	push {lr}
+	result .req r0
 	bl GetMailboxBase
 	
 	rightmail$:
@@ -34,7 +35,8 @@ MailboxRead:
 		.unreq msgChannel
 		bne rightmail$
 
-	and r0,message,#0xfffffff0
+	and result,message,#0xfffffff0
+	.unreq result
 	.unreq message
 	.unreq channel
 	.unreq mailbox
@@ -42,16 +44,17 @@ MailboxRead:
 
 /*
 * writes to the mailbox
-* r0: channel in the low 4 bits, value in high 28 bits.
-* C++: void MailboxWrite(u32 value, u8 channel)
+* r0: channel (low 4 bits)
+* r1: value in high 28 bits.
+* C++: void MailboxWrite(u8 channel, u32 value)
 */
 .globl MailboxWrite
 MailboxWrite: 
 	mailbox .req r0
 	message .req r1
 	channel .req r2
-	and channel,r1,#0xf
-	and message,r0,#0xfffffff0
+	and channel,r0,#0xf
+	and message,r1,#0xfffffff0
 	orr message,channel
 	.unreq channel
 	status .req r2
