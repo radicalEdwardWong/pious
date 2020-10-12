@@ -50,7 +50,7 @@ main:
 	mov r0,#1024
 	mov r1,#768
 	mov r2,#16
-	bl InitialiseFrameBuffer
+	bl InitializeFrameBuffer
 
 /* 
 * Check for a failed frame buffer.
@@ -79,7 +79,7 @@ main:
 */
 	bl SetGraphicsAddress
 
-	bl UsbInitialise
+	bl UsbInitialize
 	
 reset$:
 	mov sp,#0x8000

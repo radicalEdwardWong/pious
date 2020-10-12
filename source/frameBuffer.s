@@ -24,7 +24,7 @@ FrameBufferInfo:
 	.int 0		/* #36 GPU - Size */
 
 /* 
-* InitialiseFrameBuffer creates a frame buffer of specified width and height.
+* InitializeFrameBuffer creates a frame buffer of specified width and height.
 * This procedure blocks until a frame buffer can be created, and so is inapropriate
 * on real time systems. While blocking, this procedure causes the OK LED to flash.
 * If the frame buffer cannot be created, this procedure returns 0.
@@ -32,12 +32,12 @@ FrameBufferInfo:
 * r1: height
 * r2: bit depth specified
 * returns: FrameBuferDescription on success, or 0 on failure
-* C++: FrameBuferDescription* InitialiseFrameBuffer(u32 width,
+* C++: FrameBuferDescription* InitializeFrameBuffer(u32 width,
 *		u32 height, u32 bitDepth)
 */
 .section .text
-.globl InitialiseFrameBuffer
-InitialiseFrameBuffer:
+.globl InitializeFrameBuffer
+InitializeFrameBuffer:
 	width .req r0
 	height .req r1
 	bitDepth .req r2
