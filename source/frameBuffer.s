@@ -17,7 +17,7 @@ FrameBufferInfo:
 	.int 1024	/* #8 virtual Width */
 	.int 768	/* #12 Virtual Height */
 	.int 0		/* #16 GPU - Pitch */
-	.int 24		/* #20 Bit Dpeth */
+	.int 16		/* #16 Bit Depth */
 	.int 0		/* #24 X */
 	.int 0		/* #28 Y */
 	.int 0		/* #32 GPU - Pointer */

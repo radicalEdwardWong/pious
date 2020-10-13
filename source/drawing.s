@@ -1,16 +1,6 @@
-/******************************************************************************
-*	drawing.s
-*	 by Alex Chadwick
-*
-*	A sample assembly code implementation of the input02 operating system.
-*	See main.s for details.
-*
-*	drawing.s contains code to do with drawing shapes to the screen.
-******************************************************************************/
-
 /*
 * The foreColour is the colour which all our methods will draw shapes in.
-* C++ Signature: short foreColour;
+* C++: short foreColour;
 */
 .section .data
 .align 1
@@ -19,7 +9,7 @@ foreColour:
 
 /*
 * graphicsAddress stores the address of the frame buffer info structure. 
-* C++ Signature: FrameBuferDescription* graphicsAddress;
+* C++: FrameBuferDescription* graphicsAddress;
 */
 .align 2
 graphicsAddress:
@@ -34,14 +24,13 @@ font:
 
 /*
 * SetForeColour changes the current drawing colour to the 16 bit colour in r0.
-* C++ Signature: void SetForeColour(u16 colour);
+* C++: void SetForeColour(u16 colour);
 */
 .section .text
 .globl SetForeColour
 SetForeColour:
 	cmp r0,#0x10000
-	movhi pc,lr
-	moveq pc,lr
+	movhis pc,lr
 
 	ldr r1,=foreColour
 	strh r0,[r1]
@@ -61,7 +50,7 @@ SetGraphicsAddress:
 	
 /*
 * DrawPixel draws a single pixel to the screen at the point in (r0,r1).
-* C++ Signature: void DrawPixel(u32x2 point);
+* C: void DrawPixel(u32 x, u32 y);
 */
 .globl DrawPixel
 DrawPixel:
@@ -74,22 +63,20 @@ DrawPixel:
 	
 	height .req r3
 	ldr height,[addr,#4]
-	sub height,#1
 	cmp py,height
-	movhi pc,lr
+	movhs pc,lr
 	.unreq height
 	
 	width .req r3
-	ldr width,[addr,#0]
-	sub width,#1
+	ldr width,[addr]
 	cmp px,width
-	movhi pc,lr
+	movhs pc,lr
 	
 	ldr addr,[addr,#32]
-	add width,#1
 	mla px,py,width,px
 	.unreq width
 	.unreq py
+	/* 16-bit depth (hi-color) */
 	add addr, px,lsl #1
 	.unreq px
 
