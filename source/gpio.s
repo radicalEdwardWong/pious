@@ -34,24 +34,24 @@ SetGpioFunction:
 	lsl pinFunctions,pinGroupOffset
 	
 	/* r1 = (pin# % 10) x 3 */
-	
+
 	/* preserve settings in this pin group */
-	pinFunMask .req r3
-	mov pinFunMask,#7
-	lsl pinFunMask,pinGroupOffset
-	.unreq pinGroupOffset
-	pinGroupFunctions .req r2
-	ldr pinGroupFunctions,[gpioAddrOffset]
+	mask .req r3
+	mov mask,#7					/* r3 = 111 in binary */
+	lsl mask,pinGroupOffset				/* r3 = 11100..00 where the 111 is in the same position as the function in r1 */
 
-	/* first clear pin function bits, then apply new pin function */
-	eor pinGroupFunctions,pinFunMask
-	and pinGroupFunctions,pinFunctions
-	
-	str pinGroupFunctions,[r0]
+	mvn mask,mask				/* r3 = 11..1100011..11 where the 000 is in the same poisiont as the function in r1 */
+	oldFunc .req r2
+	ldr oldFunc,[gpioAddrOffset]		/* r2 = existing code */
+	and oldFunc,mask			/* r2 = existing code with bits for this pin all 0 */
+	.unreq mask
 
+	orr pinFunctions,oldFunc			/* r1 = existing code with correct bits set */
+	.unreq oldFunc
+
+	str pinFunctions,[r0]
 	.unreq gpioAddrOffset
 	.unreq pinFunctions
-	.unreq pinGroupFunctions
 	
 	pop {pc}
 
