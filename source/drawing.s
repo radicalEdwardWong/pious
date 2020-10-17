@@ -56,43 +56,45 @@ SetGraphicsAddress:
 DrawPixel:
 	px .req r0
 	py .req r1
-	
-	addr .req r2
-	ldr addr,=graphicsAddress
-	ldr addr,[addr]
-	
+
+	fbInfoAddr .req r2
+	ldr fbInfoAddr,=graphicsAddress
+	ldr fbInfoAddr,[fbInfoAddr]
+
 	height .req r3
-	ldr height,[addr,#4]
+	ldr height,[fbInfoAddr,#4]
 	cmp py,height
 	movhs pc,lr
 	.unreq height
-	
+
 	width .req r3
-	ldr width,[addr]
+	ldr width,[fbInfoAddr]
 	cmp px,width
 	movhs pc,lr
-	
-	ldr addr,[addr,#32]
+
+	.unreq fbInfoAddr
+	framebuffer .req r2
+	ldr framebuffer,[fbInfoAddr,#32]
 	mla px,py,width,px
 	.unreq width
 	.unreq py
 	/* 16-bit depth (hi-color) */
-	add addr, px,lsl #1
+	add framebuffer, px,lsl #1
 	.unreq px
 
 	fore .req r3
 	ldr fore,=foreColour
 	ldrh fore,[fore]
-	
-	strh fore,[addr]
+
+	strh fore,[framebuffer]
 	.unreq fore
-	.unreq addr
+	.unreq framebuffer
 	mov pc,lr
 
 /*
 * DrawLine draws a line between two points given in (r0,r1) and (r2,r3).
 * Uses Bresenham's Line Algortihm
-* C++ Signature: void DrawLine(u32x2 p1, u32x2 p2);
+* C++: void DrawLine(u32x2 p1, u32x2 p2);
 */
 .globl DrawLine
 DrawLine:
@@ -118,7 +120,7 @@ DrawLine:
 	movgt sx,#-1
 	suble dx,x1,x0
 	movle sx,#1
-	
+
 	cmp y0,y1
 	subgt dyn,y1,y0
 	movgt sy,#-1
@@ -162,7 +164,7 @@ DrawLine:
 * DrawCharacter renders the image for a single character given in r0 to the
 * screen, with to left corner given by (r1,r2), and returns the width of the 
 * printed character in r0, and the height in r1.
-* C++ Signature: u32x2 DrawCharacter(char character, u32 x, u32 y);
+* C++: u32x2 DrawCharacter(char character, u32 x, u32 y);
 */
 .globl DrawCharacter
 DrawCharacter:
@@ -170,6 +172,7 @@ DrawCharacter:
 	y .req r5
 	charAddr .req r6
 
+	/* if char > 127 return: width = 0, height = 0 */
 	cmp r0,#0x7F
 	movhi r0,#0
 	movhi r1,#0
@@ -180,12 +183,13 @@ DrawCharacter:
 
 	push {r4,r5,r6,r7,r8,lr}
 	ldr charAddr,=font
+	/* char address = font + (char * 16) */
 	add charAddr, r0,lsl #4
 	
 	lineLoop$:
 		bits .req r7
 		bit .req r8
-		ldrb bits,[charAddr]		
+		ldrb bits,[charAddr]
 		mov bit,#8
 
 		charPixelLoop$:
@@ -225,9 +229,13 @@ DrawCharacter:
 
 /* 
 * DrawString renders the image for a string of characters given in r0 (length
-* in r1) to the screen, with to left corner given by (r2,r3). Obeys new line
+* in r1) to the screen, with the left corner given by (r2,r3). Obeys new line
 * and horizontal tab characters.
-* C++ Signature: void DrawString(char* string, u32 length, u32 x, u32 y);
+* r0: string of characters
+* r1: length of string
+* r2: x position of top-left corner
+* r3: y position of top-left corner
+* C++: void DrawString(char* string, u32 length, u32 x, u32 y);
 */
 .globl DrawString
 DrawString:
@@ -241,10 +249,10 @@ DrawString:
 	push {r4,r5,r6,r7,r8,r9,lr}
 
 	mov string,r0
-	mov x,r2
-	mov x0,x
-	mov y,r3
 	mov length,r1
+	mov x,r2
+	mov y,r3
+	mov x0,x
 
 	stringLoop$:
 		subs length,#1
@@ -261,18 +269,23 @@ DrawString:
 		cheight .req r1
 
 		teq char,#'\n'
+		/* newline condition: */
 		moveq x,x0
 		addeq y,cheight
 		beq stringLoop$
 
 		teq char,#'\t'
+		/* char is not a newline or tab;
+		 * so increment x by char width */
 		addne x,cwidth
 		bne stringLoop$
 
-		add cwidth, cwidth,lsl #2
+		/* tab condition: 
+		 * tabwidth = 4 chars */
+		lsl cwidth,#2
 		x1 .req r1
 		mov x1,x0
-			
+		
 		stringLoopTab$:
 			add x1,cwidth
 			cmp x,x1
@@ -283,7 +296,7 @@ DrawString:
 	stringLoopEnd$:
 	.unreq cwidth
 	.unreq cheight
-	
+
 	pop {r4,r5,r6,r7,r8,r9,pc}
 	.unreq x
 	.unreq y

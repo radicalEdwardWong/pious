@@ -1,11 +1,11 @@
 /* 
 * .align 12 = page width alignment.
 * C++:
-* struct FrameBuferDescription {
+* struct FrameBufferDescription {
 *  u32 width; u32 height; u32 vWidth; u32 vHeight; u32 pitch; u32 bitDepth;
 *  u32 x; u32 y; void* pointer; u32 size;
 * };
-* FrameBuferDescription FrameBufferInfo =
+* FrameBufferDescription FrameBufferInfo =
 *		{ 1024, 768, 1024, 768, 0, 24, 0, 0, 0, 0 };
 */
 .section .data
@@ -31,8 +31,8 @@ FrameBufferInfo:
 * r0: width
 * r1: height
 * r2: bit depth specified
-* returns: FrameBuferDescription on success, or 0 on failure
-* C++: FrameBuferDescription* InitializeFrameBuffer(u32 width,
+* returns: FrameBufferDescription on success, or 0 on failure
+* C++: FrameBufferDescription* InitializeFrameBuffer(u32 width,
 *		u32 height, u32 bitDepth)
 */
 .section .text
