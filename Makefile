@@ -59,6 +59,11 @@ $(BUILD)%.o: $(SOURCE)%.s
 $(BUILD):
 	mkdir $@
 
+and-deploy: clean all
+	sudo mount /dev/sdb1 ~/sd
+	sudo cp /home/ethan/proj/raspPiOS/os/kernel.img ~/sd/kernel.img
+	sudo umount /dev/sdb1
+
 # Rule to clean files.
 clean : 
 	-rm -rf $(BUILD)
