@@ -1,10 +1,4 @@
 /******************************************************************************
-*	tags.s
-*	 by Alex Chadwick
-*
-*	A sample assembly code implementation of the input02 operating system.
-*	See main.s for details.
-*
 *	tags.s contains code to do with reading the ARM Linux boot tags.
 ******************************************************************************/
 
@@ -12,70 +6,92 @@
 * The following values are the addresses of all tags detected, with 0
 * representing an undetected tag.
 */
+.align 2
 .section .data
-tag_core: .int 0 
-tag_mem: .int 0 
-tag_videotext: .int 0 
-tag_ramdisk: .int 0 
-tag_initrd2: .int 0 
-tag_serial: .int 0 
-tag_revision: .int 0 
-tag_videolfb: .int 0 
-tag_cmdline: .int 0 
+TagAddressLookup:
+tag_core: .int 0
+tag_mem: .int 0
+tag_videotext: .int 0
+tag_ramdisk: .int 0
+tag_initrd2: .int 0
+tag_serial: .int 0
+tag_revision: .int 0
+tag_videolfb: .int 0
+tag_cmdline: .int 0
 
-/* 
+.align 2
+.section .text
+
+.globl GetTagAddress
+GetTagAddress:
+	mov r0,#0x100
+	mov pc,lr
+
+/*
 * FindTag finds the address of all the tags if necessary, and returns the
 * address of the tag who's number is given in r0.
 * C++ Signature: void* FindTag(u16 tagNumber)
 */
-.section .text
 .globl FindTag
 FindTag:
 	tag .req r0
-	tagList .req r1
+	tagLookup .req r1
 	tagAddr .req r2
 	push {lr}
 	sub tag,#1
 	cmp tag,#8
-	movhi tag,#0
+	/* validate that: 0 < tag <= 9 */
+	movhi r0,#0
 	pophi {pc}
 
-	ldr tagList,=tag_core
-tagReturn$:
-	add tagAddr,tagList, tag,lsl #2
-	ldr tagAddr,[tagAddr]
+	ldr tagLookup,=TagAddressLookup
+	tagReturn$:
+		/* get tag address from tag list */
+		add tagAddr,tagLookup, tag,lsl #2
+		ldr tagAddr,[tagAddr]
 
-	teq tagAddr,#0
-	movne r0,tagAddr
-	popne {pc}
+		/* return tag address if we have it */
+		teq tagAddr,#0
+		movne r0,tagAddr
+		popne {pc}
 
-	ldr tagAddr,[tagList]
-	teq tagAddr,#0
-	movne r0,#0
-	popne {pc}
+		/* check if tag list was loaded */
+		ldr tagAddr,[tagLookup]
+		teq tagAddr,#0
+		/* tag not found, return 0 */
+		movne r0,#0
+		popne {pc}
 
-	mov tagAddr,#0x100
-	push {r4}
-	tagIndex .req r3
-	oldAddr .req r4
-tagLoop$:
-	ldrh tagIndex,[tagAddr,#4]
-	subs tagIndex,#1
-	poplt {r4}
-	blt tagReturn$
+		/* tag list not loaded...so begin searching for
+		 * tag while populating the list along the way */
+		mov tagAddr,#0x100
+		push {r4}
+		tagIndex .req r3
+		oldAddr .req r4
+	tagLoop$:
+		/* get tag index from 1st half-word of 2nd word in tag block */
+		ldrh tagIndex,[tagAddr,#4]
+		subs tagIndex,#1
+		/* if tagIndex = 0, we're at the end of the tags, return */
+		poplt {r4}
+		blt tagReturn$
 
-	add tagIndex,tagList, tagIndex,lsl #2
-	ldr oldAddr,[tagIndex]
-	teq oldAddr,#0
-	.unreq oldAddr
-	streq tagAddr,[tagIndex]
+		/* check if already have address for this tag index, and save it if not */
+		savedTagAddr .req r3
+		add savedTagAddr,tagLookup, tagIndex,lsl #2
+		ldr oldAddr,[savedTagAddr]
+		teq oldAddr,#0
+		.unreq oldAddr
+		streq tagAddr,[savedTagAddr]
+		.unreq savedTagAddr
 
-	ldr tagIndex,[tagAddr]
-	add tagAddr, tagIndex,lsl #2
-	b tagLoop$
-                    
-    .unreq tag
-    .unreq tagList
+		tagWordSize .req r3
+		ldr tagWordSize,[tagAddr]
+		/* advance tag address forward the size of the current tag, and continue search */
+		add tagAddr, tagWordSize,lsl #2
+		b tagLoop$
+
+    .unreq tagLookup
     .unreq tagAddr
     .unreq tagIndex
 
