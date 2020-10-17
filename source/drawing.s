@@ -72,9 +72,11 @@ DrawPixel:
 	cmp px,width
 	movhs pc,lr
 
-	.unreq fbInfoAddr
 	framebuffer .req r2
 	ldr framebuffer,[fbInfoAddr,#32]
+	.unreq fbInfoAddr
+
+	/* x-byte = (y * width) + x-pos */
 	mla px,py,width,px
 	.unreq width
 	.unreq py
@@ -303,3 +305,88 @@ DrawString:
 	.unreq x0
 	.unreq string
 	.unreq length
+
+/*
+* DrawLongString renders the image for a string of characters given in r0 to the screen,
+* with the left corner given by (r2,r3). Obeys new line and horizontal tab characters.
+* It will continue until a null character is found, at which point it will return the
+* final length of the rendered string, excluding the null terminating character.
+* Warning: this function will behave unexpectedly for non-null terminated strings.
+* r0: string of characters, followed by a null character
+* r1: x position of top-left corner
+* r2: y position of top-left corner
+* returns: length of string minus the null character
+* C++: u32 DrawString(char* string, u32 x, u32 y);
+*/
+.globl DrawLongString
+DrawLongString:
+	x .req r4
+	y .req r5
+	x0 .req r6
+	string .req r7
+	char .req r8
+	length .req r9
+
+	push {r4,r5,r6,r7,r8,r9,lr}
+
+	mov string,r0
+	mov x,r1
+	mov y,r2
+	mov x0,x
+	mov length,#0
+
+	longStringLoop$:
+		ldrb char,[string]
+
+		/* end of string: */
+		teq char,#'\0'
+		moveq r0,length
+		beq longStringLoopEnd$
+
+		/* end not reached, increment string pointer: */
+		add length,#1
+		add string,#1
+
+		mov r0,char
+		mov r1,x
+		mov r2,y
+		bl DrawCharacter
+		cwidth .req r0
+		cheight .req r1
+
+		teq char,#'\n'
+		/* newline condition: */
+		moveq x,x0
+		addeq y,cheight
+		beq longStringLoop$
+
+		teq char,#'\t'
+		/* char is not a newline or tab;
+		 * so increment x by char width */
+		addne x,cwidth
+		bne longStringLoop$
+
+		/* tab condition:
+		 * tabwidth = 4 chars */
+		lsl cwidth,#2
+		x1 .req r1
+		mov x1,x0
+
+		longStringLoopTab$:
+			add x1,cwidth
+			cmp x,x1
+			bge longStringLoopTab$
+		mov x,x1
+		.unreq x1
+		b longStringLoop$
+	longStringLoopEnd$:
+	.unreq cwidth
+	.unreq cheight
+
+	pop {r4,r5,r6,r7,r8,r9,pc}
+	.unreq x
+	.unreq y
+	.unreq x0
+	.unreq string
+	.unreq length
+
