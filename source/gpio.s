@@ -95,3 +95,31 @@ SetGpio:
 	.unreq gpioAddr
 	pop {pc}
 
+
+.globl BlinkLed
+BlinkLed:
+	push {lr}
+
+	mov r0,#16
+	mov r1,#1
+	bl SetGpioFunction
+
+	mov r0,#16
+	mov r1,#0
+	bl SetGpio
+
+	mov r0,#1
+	lsl r0,#19
+	add r0,r0
+	bl Wait
+
+	mov r0,#16
+	mov r1,#1
+	bl SetGpio
+
+	mov r0,#1
+	lsl r0,#19
+	add r0,r0
+	bl Wait
+
+	pop {pc}
