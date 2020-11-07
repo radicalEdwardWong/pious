@@ -1,0 +1,10 @@
+/****************************************************************
+ * PIOUS - the most devout Raspberry PI Operating Ultra-System *
+ ****************************************************************/
+
+Commands: echo, reset, ok and cls
+
+- echo: echos user input
+- reset: restarts OS
+- ok: Toggles on OK LED 
+- cls: exits the kernel loop
