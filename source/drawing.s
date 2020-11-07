@@ -1,3 +1,7 @@
+/******************************************************************************************
+*	drawing.s contains code for drawing lines and pixels with color to the GPU framebuffer
+******************************************************************************************/
+
 /*
 * The foreColour is the colour which all our methods will draw shapes in.
 * C++: short foreColour;
@@ -40,7 +44,7 @@ SetForeColour:
 /*
 * SetGraphicsAddress changes the current frame buffer information to 
 * graphicsAddress;
-* C++ Signature: void SetGraphicsAddress(FrameBuferDescription* value);
+* C++: void SetGraphicsAddress(FrameBuferDescription* value);
 */
 .globl SetGraphicsAddress
 SetGraphicsAddress:

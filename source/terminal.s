@@ -1,10 +1,4 @@
 /******************************************************************************
-*	terminal.s
-*	 by Alex Chadwick
-*
-*	A sample assembly code implementation of the input02 operating system.
-*	See main.s for details.
-*
 *	terminal.s contains code to do with the text terminal which the os uses
 ******************************************************************************/
 
@@ -14,7 +8,7 @@
 /* NEW
 * terminalStart is the address in the terminalBuffer of the first valid 
 * character.
-* C++ Signature: u32 terminalStart;
+* C++: u32 terminalStart;
 */
 terminalStart:
 	.int terminalBuffer
@@ -22,7 +16,7 @@ terminalStart:
 /* NEW
 * terminalStop is the address in the terminalBuffer of the last valid
 * character.
-* C++ Signature: u32 terminalStop;
+* C++: u32 terminalStop;
 */
 terminalStop:
 	.int terminalBuffer
@@ -30,7 +24,7 @@ terminalStop:
 /* NEW
 * terminalView is the address in the terminalBuffer of the first displayed
 * character.
-* C++ Signature: u32 terminalView;
+* C++: u32 terminalView;
 */
 terminalView:
 	.int terminalBuffer
@@ -38,14 +32,14 @@ terminalView:
 /* NEW
 * terminalInput is the address in the terminalBuffer of the first character of
 * the text being input.
-* C++ Signature: u32 terminalView;
+* C++: u32 terminalView;
 */
 terminalColour:
 	.byte 0xf
 
 /* NEW
 * terminalBuffer is where all text is stored for the console.
-* C++ Signature: u16 terminalBuffer[128*128];
+* C++: u16 terminalBuffer[128*128];
 */
 .align 8
 terminalBuffer:
@@ -57,7 +51,7 @@ terminalBuffer:
 /* NEW
 * terminalScreen stores the text last rendered to the screnn by the console.
 * This means when redrawing the screen, only changes need be drawn.
-* C++ Signature: u16 terminalScreen[1024/8 * 768/16];
+* C++: u16 terminalScreen[1024/8 * 768/16];
 */
 terminalScreen:
 	.rept 1024/8 * 768/16
@@ -69,7 +63,7 @@ terminalScreen:
 /* NEW
 * Sets the fore colour to the specified terminal colour. The low 4 bits of r0
 * contains the terminal colour code.
-* C++ Signature: void TerminalColour(u8 colour);
+* C++: void TerminalColour(u8 colour);
 */
 TerminalColour:
 	teq r0,#6
@@ -90,7 +84,7 @@ TerminalColour:
 
 /* NEW
 * Copies the currently displayed part of TerminalBuffer to the screen.
-* C++ Signature: void TerminalDisplay();
+* C++: void TerminalDisplay();
 */
 .globl TerminalDisplay
 TerminalDisplay:
@@ -169,7 +163,7 @@ TerminalDisplay:
 	
 /* NEW
 * Clears the terminal to blank.
-* C++ Signature: void TerminalClear();
+* C++: void TerminalClear();
 */
 .globl TerminalClear
 TerminalClear:
@@ -184,7 +178,7 @@ TerminalClear:
 * Prints a string to the terminal at the current location. r0 contains a 
 * pointer to the ASCII encoded string, and r1 contains its length. New lines
 * are obeyed.
-* C++ Signature: void Print(char* string, u32 length);
+* C++: void Print(char* string, u32 length);
 */
 .globl Print
 Print:
@@ -284,7 +278,7 @@ Print:
 * Reads the next string a user types in up to r1 bytes and stores it in r0. 
 * Characters types after maxLength are ignored. Keeps reading until the user 
 * presses enter or return. Length of read string is returned in r0.
-* C++ Signature: u32 Print(char* string, u32 maxLength);
+* C++: u32 Print(char* string, u32 maxLength);
 */
 .globl ReadLine
 ReadLine:

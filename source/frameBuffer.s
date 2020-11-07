@@ -1,3 +1,7 @@
+/******************************************************************************
+*	frameBuffer.s contains code for interacting with the GPU framebuffer
+******************************************************************************/
+
 /* 
 * .align 12 = page width alignment.
 * C++:

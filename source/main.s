@@ -1,10 +1,4 @@
 /******************************************************************************
-*	main.s
-*	 by Alex Chadwick
-*
-*	A sample assembly code implementation of the input02 operating system, that 
-*	demonstrates a command line interface.
-*
 *	main.s contains the main operating system, and IVT code.
 ******************************************************************************/
 
@@ -34,7 +28,7 @@ b main
 /*
 * main is what we shall call our main operating system method. It never 
 * returns, and takes no parameters.
-* C++ Signature: void main(void)
+* C++: void main(void)
 */
 main:
 

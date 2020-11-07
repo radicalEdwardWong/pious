@@ -1,3 +1,6 @@
+/******************************************************************************
+*	mailbox.s contains code for interacting with the keyboard driver
+******************************************************************************/
 
 .globl GetMailboxBase
 GetMailboxBase: 
@@ -7,7 +10,7 @@ GetMailboxBase:
 /*
 * returns the current value in the mailbox
 * r0: channel in the low 4 bits, value in high 28 bits.
-* C++ Signature: u32 MailboxRead(u8 channel)
+* C++: u32 MailboxRead(u8 channel)
 */
 .globl MailboxRead
 MailboxRead: 

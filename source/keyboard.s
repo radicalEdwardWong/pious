@@ -1,17 +1,11 @@
 /******************************************************************************
-*	keyboard.s
-*	 by Alex Chadwick
-*
-*	A sample assembly code implementation of the input02 operating system.
-*	See main.s for details.
-*
-*	keyboard.s contains code to do with the keyboard.
+*	keyboard.s contains code for interacting with the keyboard driver
 ******************************************************************************/
 
 .section .data
 /*
 * The address of the keyboard we're reading from.
-* C++ Signautre: u32 KeyboardAddress;
+* C++: u32 KeyboardAddress;
 */
 .align 2
 KeyboardAddress:
@@ -19,7 +13,7 @@ KeyboardAddress:
 	
 /*
 * The scan codes that were down before the current set on the keyboard.
-* C++ Signautre: u16* KeyboardOldDown;
+* C++: u16* KeyboardOldDown;
 */
 KeyboardOldDown:
 	.rept 6
@@ -29,7 +23,7 @@ KeyboardOldDown:
 /*
 * KeysNoShift contains the ascii representations of the first 104 scan codes
 * when the shift key is up. Special keys are ignored.
-* C++ Signature: char* KeysNoShift;
+* C++: char* KeysNoShift;
 */
 .align 3
 KeysNormal:
@@ -50,7 +44,7 @@ KeysNormal:
 /*
 * KeysShift contains the ascii representations of the first 104 scan codes
 * when the shift key is held. Special keys are ignored.
-* C++ Signature: char* KeysShift;
+* C++: char* KeysShift;
 */
 .align 3
 KeysShift:
@@ -71,7 +65,7 @@ KeysShift:
 .section .text
 /*
 * Updates the keyboard pressed and released data.
-* C++ Signature: void KeyboardUpdate();
+* C++: void KeyboardUpdate();
 */
 .globl KeyboardUpdate
 KeyboardUpdate:
@@ -127,7 +121,7 @@ return$:
 /*
 * Returns r0=0 if a in r1 key was not pressed before the current scan, and r0
 * not 0 otherwise.
-* C++ Signature bool KeyWasDown(u16 scanCode)
+* C++ bool KeyWasDown(u16 scanCode)
 */
 .globl KeyWasDown
 KeyWasDown:
@@ -151,7 +145,7 @@ KeyWasDown:
 /*
 * Returns the ascii character last typed on the keyboard, with r0=0 if no 
 * character was typed.
-* C++ Signature char KeyboardGetChar()
+* C++ char KeyboardGetChar()
 */
 .globl KeyboardGetChar
 KeyboardGetChar:	

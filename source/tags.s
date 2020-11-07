@@ -30,7 +30,7 @@ GetTagAddress:
 /*
 * FindTag finds the address of all the tags if necessary, and returns the
 * address of the tag who's number is given in r0.
-* C++ Signature: void* FindTag(u16 tagNumber)
+* C++: void* FindTag(u16 tagNumber)
 */
 .globl FindTag
 FindTag:

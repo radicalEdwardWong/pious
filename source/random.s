@@ -1,3 +1,7 @@
+/******************************************************************************
+*	random.s contains a pseudo-randomizer function
+******************************************************************************/
+
 /*
 * Random is a function with an input of the last number it generated, and an 
 * output of the next number in a pseduo random number sequence.

@@ -1,3 +1,6 @@
+/******************************************************************************
+*	systemTimer.s contains functions for interacting with the system timer
+******************************************************************************/
 
 .globl GetSystemTimerBase
 GetSystemTimerBase: 

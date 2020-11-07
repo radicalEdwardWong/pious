@@ -1,16 +1,10 @@
 /******************************************************************************
-*	text.s
-*	 by Alex Chadwick
-*
-*	A sample assembly code implementation of the input02 operating system.
-*	See main.s for details.
-*
 *	text.s contains code to do with manipulating text
 ******************************************************************************/
 
 /* 
 * ReverseString reverses a string, with pointer in r0, and length in r1.
-* C++ Signature: void ReverseString(char* string, u32 length);
+* C++: void ReverseString(char* string, u32 length);
 */
 .globl ReverseString
 ReverseString:
@@ -37,7 +31,7 @@ ReverseString:
 * actually output the string. The output string is not longer than 32
 * characters. The base of the number is given in r2. Base can be any value 
 * between 2 and 36.
-* C++ Signature: u32 UnsignedString(u32 value, char* string, u32 base)
+* C++: u32 UnsignedString(u32 value, char* string, u32 base)
 */
 .globl UnsignedString
 UnsignedString:
@@ -81,7 +75,7 @@ UnsignedString:
 * actually output the string. The output string is not longer than 32
 * characters. The base of the number is given in r2. Base can be any value 
 * between 2 and 36.
-* C++ Signature: u32 SignedString(s32 value, char* string, u32 base);
+* C++: u32 SignedString(s32 value, char* string, u32 base);
 */
 .globl SignedString
 SignedString:
@@ -107,7 +101,7 @@ SignedString:
 * length in r1, and stores it in r2, with a variable number of arguments, and
 * returns the length of the constructed string. if r2 is 0, it doesn't output
 * the string.
-* C++ Signature: u32 FormatString(char* format, u32 length, char* dest, ...);
+* C++: u32 FormatString(char* format, u32 length, char* dest, ...);
 * The format is akin to printf:
 *  %% outputs a '%'
 *  %c outputs the next argument as a character.
