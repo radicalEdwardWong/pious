@@ -95,19 +95,24 @@ getKeyboard$:
 	mov kbd,r0
 
 haveKeyboard$:
-	mov r5,#0
+	scanCodeAddr .req r1
+	oldKeyDownIndex .req  r5
+	mov oldKeyDownIndex,#0
 
 	saveKeys$:
 		mov r0,kbd
-		mov r1,r5
+		mov scanCodeAddr,oldKeyDownIndex
 		bl KeyboardGetKeyDown
+		scanCodeValue .req r0
 
-		ldr r1,=KeyboardOldDown
-		add r1,r5,lsl #1
-		strh r0,[r1]
-		add r5,#1
-		cmp r5,#6
+		ldr scanCodeAddr,=KeyboardOldDown
+		add scanCodeAddr,oldKeyDownIndex,lsl #1
+		strh scanCodeValue,[scanCodeAddr]
+		add oldKeyDownIndex,#1
+		cmp oldKeyDownIndex,#6
 		blt saveKeys$
+		.unreq oldKeyDownIndex
+		.unreq scanCodeValue
 
 	mov r0,kbd
 	bl KeyboardPoll
@@ -125,21 +130,29 @@ return$:
 */
 .globl KeyWasDown
 KeyWasDown:
-	ldr r1,=KeyboardOldDown
-	mov r2,#0
+	keyCode .req r0
+	wasDown .req r0
+	oldKeyDownAddr .req r1
+	oldKeyIndex .req r2
+	ldr oldKeyDownAddr,=KeyboardOldDown
+	mov oldKeyIndex,#0
 
 	keySearch$:
-		ldrh r3,[r1]
-		teq r3,r0
-		moveq r0,#1
+		ldrh r3,[oldKeyDownAddr]
+		teq r3,keyCode
+		moveq wasDown,#1
 		moveq pc,lr
 
-		add r1,#2
-		add r2,#1
-		cmp r2,#6
+		add oldKeyDownAddr,#2
+		add oldKeyIndex,#1
+		cmp oldKeyIndex,#6
 		blt keySearch$
 
-	mov r0,#0
+	mov wasDown,#0
+	.unreq keyCode
+	.unreq wasDown
+	.unreq oldKeyDownAddr
+	.unreq oldKeyIndex
 	mov pc,lr
 	
 /*
