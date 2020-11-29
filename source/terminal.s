@@ -6,7 +6,7 @@
 .align 4
 
 /*
-* terminalStart is the address in the terminalBuffer of the first valid 
+* terminalStart is the address in the terminalBuffer of the first valid
 * character.
 * C++: u32 terminalStart;
 */
@@ -28,7 +28,7 @@ terminalStop:
 */
 terminalView:
 	.int terminalBuffer
-	
+
 /*
 * terminalColour is the 8 bit color, with low 4 bits for fore color,
 * and high 4 bits for background color.
@@ -47,7 +47,7 @@ terminalBuffer:
 	.byte 0x7f
 	.byte 0x0
 	.endr
-	
+
 /*
 * terminalScreen stores the text last rendered to the screnn by the console.
 * This means when redrawing the screen, only changes need be drawn.
@@ -56,10 +56,10 @@ terminalBuffer:
 terminalScreen:
 	.rept 1024/8 * 768/16
 	.byte 0x7f
-	.byte 0x0	
+	.byte 0x0
 	.endr
-	
-.section .text			
+
+.section .text
 /*
 * Sets the fore colour to the specified terminal colour. The low 4 bits of r0
 * contains the terminal colour code.
@@ -107,7 +107,7 @@ TerminalDisplay:
 	ldr view,[taddr,#terminalView - terminalStart]
 	ldr stop,[taddr,#terminalStop - terminalStart]
 	add taddr,#terminalBuffer - terminalStart
-	add taddr,#128*128*2 
+	add taddr,#128*128*2
 	mov screen,taddr
 
 	mov y,#0
@@ -133,7 +133,7 @@ TerminalDisplay:
 			mov r1,x
 			mov r2,y
 			bl DrawCharacter
-						
+
 			and r0,col,#0xf
 			bl TerminalColour
 
@@ -175,12 +175,12 @@ TerminalClear:
 	ldr r0,=terminalStart
 	add r1,r0,#terminalBuffer-terminalStart
 	str r1,[r0]
-	str r1,[r0,#terminalStop-terminalStart]	
-	str r1,[r0,#terminalView-terminalStart]	
+	str r1,[r0,#terminalStop-terminalStart]
+	str r1,[r0,#terminalView-terminalStart]
 	mov pc,lr
 
 /*
-* Prints a string to the terminal at the current location. r0 contains a 
+* Prints a string to the terminal at the current location. r0 contains a
 * pointer to the ASCII encoded string, and r1 contains its length. New lines
 * are obeyed.
 * C++: void Print(char* string, u32 length);
@@ -262,7 +262,7 @@ Print:
 		bgt charLoop$
 
 	charLoopBreak$:
-	
+
 	sub taddr,#128*128*2
 	sub taddr,#terminalBuffer-terminalStart
 	str bufferStop,[taddr,#terminalStop-terminalStart]
@@ -270,9 +270,9 @@ Print:
 	str bufferStart,[taddr]
 
 	pop {r4,r5,r6,r7,r8,r9,r10,r11,pc}
-	.unreq bufferStart 
-	.unreq taddr 
-	.unreq x 
+	.unreq bufferStart
+	.unreq taddr
+	.unreq x
 	.unreq string
 	.unreq length
 	.unreq char
@@ -280,8 +280,8 @@ Print:
 	.unreq view
 
 /*
-* Reads the next string a user types in up to r1 bytes and stores it in r0. 
-* Characters types after maxLength are ignored. Keeps reading until the user 
+* Reads the next string a user types in up to r1 bytes and stores it in r0.
+* Characters types after maxLength are ignored. Keeps reading until the user
 * presses enter or return. Length of read string is returned in r0.
 * C++: u32 Print(char* string, u32 maxLength);
 */
@@ -313,7 +313,7 @@ ReadLine:
 	mov r0,#'_'
 	strb r0,[string,length]
 
-	readLoop$:		
+	readLoop$:
 		str input,[taddr,#terminalStop-terminalStart]
 		str view,[taddr,#terminalView-terminalStart]
 
@@ -321,11 +321,11 @@ ReadLine:
 		mov r1,length
 		add r1,#1
 		bl Print
-		bl TerminalDisplay		
+		bl TerminalDisplay
 		bl KeyboardUpdate
 		bl KeyboardGetChar
 
-		teq r0,#'\n'	
+		teq r0,#'\n'
 		beq readLoopBreak$
 		teq r0,#0
 		beq cursor$
@@ -337,7 +337,7 @@ ReadLine:
 		subgt length,#1
 		b cursor$
 
-	standard$:	
+	standard$:
 		cmp length,maxLength
 		bge cursor$
 

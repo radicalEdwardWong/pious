@@ -2,7 +2,7 @@
 *	text.s contains code to do with manipulating text
 ******************************************************************************/
 
-/* 
+/*
 * ReverseString reverses a string, with pointer in r0, and length in r1.
 * C++: void ReverseString(char* string, u32 length);
 */
@@ -25,11 +25,11 @@ ReverseString:
 		sub end,#1
 		b revLoop$
 
-/* 
+/*
 * UnsignedString converts the unsigned word in r0 and stores it to the address
 * in r1 and returns the length of the string in r0. If r1 is 0, this doesn't
 * actually output the string. The output string is not longer than 32
-* characters. The base of the number is given in r2. Base can be any value 
+* characters. The base of the number is given in r2. Base can be any value
 * between 2 and 36.
 * C++: u32 UnsignedString(u32 value, char* string, u32 base)
 */
@@ -56,7 +56,7 @@ UnsignedString:
 		add length,#1
 		teq value,#0
 		bne charLoop$
-		
+
 	.unreq value
 	.unreq base
 	teq string,#0
@@ -73,7 +73,7 @@ UnsignedString:
 * SignedString converts the signed word in r0 and stores it to the address
 * in r1 and returns the length of the string in r0. If r1 is 0, this doesn't
 * actually output the string. The output string is not longer than 32
-* characters. The base of the number is given in r2. Base can be any value 
+* characters. The base of the number is given in r2. Base can be any value
 * between 2 and 36.
 * C++: u32 SignedString(s32 value, char* string, u32 base);
 */
@@ -95,7 +95,7 @@ SignedString:
 	pop {pc}
 	.unreq value
 	.unreq string
-		
+
 /* 
 * FormatString constructs a string based on the formating information in r0,
 * length in r1, and stores it in r2, with a variable number of arguments, and
@@ -150,12 +150,12 @@ FormatString:
 		subs formatLength,#1
 		movlt r0,length
 		poplt {r4,r5,r6,r7,r8,r9,pc}
-		
+
 		ldrb r0,[format]
 		add format,#1
 		teq r0,#'%'
 		beq formatChar$
-				
+
 		teq r0,#'c'
 		moveq r0,nextArg
 		ldreq nextArg,[argList]
@@ -164,10 +164,10 @@ FormatString:
 
 		teq r0,#'s'
 		beq formatString$
-				
+
 		teq r0,#'d'
 		beq formatSigned$
-				
+
 		teq r0,#'u'
 		teqne r0,#'x'
 		teqne r0,#'b'
@@ -186,7 +186,7 @@ FormatString:
 		teq dest,#0
 		strneb r0,[dest]
 		addne dest,#1
-		add nextArg,#1		
+		add nextArg,#1
 		b formatString$
 
 	formatSigned$:
@@ -220,3 +220,4 @@ FormatString:
 		addne dest,r0
 		add length,r0
 		b formatLoop$
+
