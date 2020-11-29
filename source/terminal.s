@@ -1,11 +1,11 @@
 /******************************************************************************
-*	terminal.s contains code to do with the text terminal which the os uses
+*	terminal.s contains code to do with the text terminal
 ******************************************************************************/
 
 .section .data
 .align 4
 
-/* NEW
+/*
 * terminalStart is the address in the terminalBuffer of the first valid 
 * character.
 * C++: u32 terminalStart;
@@ -13,7 +13,7 @@
 terminalStart:
 	.int terminalBuffer
 
-/* NEW
+/*
 * terminalStop is the address in the terminalBuffer of the last valid
 * character.
 * C++: u32 terminalStop;
@@ -21,7 +21,7 @@ terminalStart:
 terminalStop:
 	.int terminalBuffer
 
-/* NEW
+/*
 * terminalView is the address in the terminalBuffer of the first displayed
 * character.
 * C++: u32 terminalView;
@@ -29,15 +29,15 @@ terminalStop:
 terminalView:
 	.int terminalBuffer
 	
-/* NEW
-* terminalInput is the address in the terminalBuffer of the first character of
-* the text being input.
+/*
+* terminalColour is the 8 bit color, with low 4 bits for fore color,
+* and high 4 bits for background color.
 * C++: u32 terminalView;
 */
 terminalColour:
 	.byte 0xf
 
-/* NEW
+/*
 * terminalBuffer is where all text is stored for the console.
 * C++: u16 terminalBuffer[128*128];
 */
@@ -48,7 +48,7 @@ terminalBuffer:
 	.byte 0x0
 	.endr
 	
-/* NEW
+/*
 * terminalScreen stores the text last rendered to the screnn by the console.
 * This means when redrawing the screen, only changes need be drawn.
 * C++: u16 terminalScreen[1024/8 * 768/16];
@@ -60,16 +60,21 @@ terminalScreen:
 	.endr
 	
 .section .text			
-/* NEW
+/*
 * Sets the fore colour to the specified terminal colour. The low 4 bits of r0
 * contains the terminal colour code.
 * C++: void TerminalColour(u8 colour);
 */
 TerminalColour:
 	teq r0,#6
+	/* #6 = brown */
 	ldreq r0,=0x02B5
 	beq SetForeColour
 
+	/* bit 4: add 1/3 to RGB
+     * bits 3-1: add 2/3 to respective RGB
+     * bit 1 = B, bit 2 = G, bit 3 = R
+     */
 	tst r0,#0b1000
 	ldrne r1,=0x52AA
 	moveq r1,#0
@@ -82,7 +87,7 @@ TerminalColour:
 	mov r0,r1
 	b SetForeColour
 
-/* NEW
+/*
 * Copies the currently displayed part of TerminalBuffer to the screen.
 * C++: void TerminalDisplay();
 */
@@ -104,7 +109,7 @@ TerminalDisplay:
 	add taddr,#terminalBuffer - terminalStart
 	add taddr,#128*128*2 
 	mov screen,taddr
-	
+
 	mov y,#0
 	yLoop$:
 		mov x,#0
@@ -150,7 +155,7 @@ TerminalDisplay:
 		add y,#16
 		teq y,#768
 		bne yLoop$
-		
+
 	pop {r4,r5,r6,r7,r8,r9,r10,r11,pc}
 	.unreq x
 	.unreq y
@@ -160,8 +165,8 @@ TerminalDisplay:
 	.unreq taddr
 	.unreq view
 	.unreq stop
-	
-/* NEW
+
+/*
 * Clears the terminal to blank.
 * C++: void TerminalClear();
 */
@@ -173,8 +178,8 @@ TerminalClear:
 	str r1,[r0,#terminalStop-terminalStart]	
 	str r1,[r0,#terminalView-terminalStart]	
 	mov pc,lr
-	
-/* NEW
+
+/*
 * Prints a string to the terminal at the current location. r0 contains a 
 * pointer to the ASCII encoded string, and r1 contains its length. New lines
 * are obeyed.
@@ -206,7 +211,7 @@ Print:
 	add taddr,#128*128*2
 	and x,bufferStop,#0xfe
 	lsr x,#1
-	
+
 	charLoop$:
 		ldrb char,[string]
 		and char,#0x7f
@@ -230,7 +235,7 @@ Print:
 		strb r0,[bufferStop,#1]
 		add bufferStop,#2
 		add x,#1
-		
+
 	charLoopContinue$:
 		cmp x,#128
 		blt noScroll$
@@ -274,7 +279,7 @@ Print:
 	.unreq bufferStop
 	.unreq view
 
-/* NEW
+/*
 * Reads the next string a user types in up to r1 bytes and stores it in r0. 
 * Characters types after maxLength are ignored. Keeps reading until the user 
 * presses enter or return. Length of read string is returned in r0.
@@ -319,7 +324,7 @@ ReadLine:
 		bl TerminalDisplay		
 		bl KeyboardUpdate
 		bl KeyboardGetChar
-		
+
 		teq r0,#'\n'	
 		beq readLoopBreak$
 		teq r0,#0
@@ -331,24 +336,24 @@ ReadLine:
 		cmp length,#0
 		subgt length,#1
 		b cursor$
-	
+
 	standard$:	
 		cmp length,maxLength
 		bge cursor$
 
 		strb r0,[string,length]
 		add length,#1
-				
+
 	cursor$:
 		ldrb r0,[string,length]
 		teq r0,#'_'
 		moveq r0,#' '
 		movne r0,#'_'
 		strb r0,[string,length]
-				
+
 		b readLoop$
 	readLoopBreak$:
-	
+
 	mov r0,#'\n'
 	strb r0,[string,length]
 
@@ -359,7 +364,7 @@ ReadLine:
 	add r1,#1
 	bl Print
 	bl TerminalDisplay
-	
+
 	mov r0,#0
 	strb r0,[string,length]
 
@@ -371,3 +376,4 @@ ReadLine:
 	.unreq taddr
 	.unreq length
 	.unreq view
+

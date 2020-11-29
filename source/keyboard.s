@@ -71,11 +71,11 @@ KeysShift:
 KeyboardUpdate:
 	push {r4,r5,lr}
 
-	kbd .req r4
+	keyAddr .req r4
 	ldr r0,=KeyboardAddress
-	ldr kbd,[r0]
+	ldr keyAddr,[r0]
 	
-	teq kbd,#0
+	teq keyAddr,#0
 	bne haveKeyboard$
 
 getKeyboard$:
@@ -92,7 +92,7 @@ getKeyboard$:
 	str r0,[r1]
 	teq r0,#0
 	beq return$
-	mov kbd,r0
+	mov keyAddr,r0
 
 haveKeyboard$:
 	scanCodeAddr .req r1
@@ -100,7 +100,7 @@ haveKeyboard$:
 	mov oldKeyDownIndex,#0
 
 	saveKeys$:
-		mov r0,kbd
+		mov r0,keyAddr
 		mov scanCodeAddr,oldKeyDownIndex
 		bl KeyboardGetKeyDown
 		scanCodeValue .req r0
@@ -114,14 +114,14 @@ haveKeyboard$:
 		.unreq oldKeyDownIndex
 		.unreq scanCodeValue
 
-	mov r0,kbd
+	mov r0,keyAddr
 	bl KeyboardPoll
 	teq r0,#0
 	bne getKeyboard$
 
 return$:
 	pop {r4,r5,pc} 
-	.unreq kbd
+	.unreq keyAddr
 	
 /*
 * Returns r0=0 if a in r1 key was not pressed before the current scan, and r0
@@ -170,15 +170,16 @@ KeyboardGetChar:
 
 	push {r4,r5,r6,lr}
 	
-	kbd .req r4
+	keyAddr .req r4
+	keyIndex .req r5
 	key .req r6
 
-	mov r4,r1	
-	mov r5,#0
+	mov keyAddr,r1
+	mov keyIndex,#0
 
 	keyLoop$:
-		mov r0,kbd
-		mov r1,r5
+		mov r0,keyAddr
+		mov r1,keyIndex
 		bl KeyboardGetKeyDown
 
 		teq r0,#0
@@ -192,9 +193,10 @@ KeyboardGetChar:
 		cmp key,#104
 		bge keyLoopContinue$
 
-		mov r0,kbd
+		mov r0,keyAddr
 		bl KeyboardGetModifiers
 
+		/* bits 1 and 5 represent left/right shift keys */
 		tst r0,#0b00100010
 		ldreq r0,=KeysNormal
 		ldrne r0,=KeysShift
@@ -204,7 +206,7 @@ KeyboardGetChar:
 		bne keyboardGetCharReturn$
 
 	keyLoopContinue$:
-		add r5,#1
+		add keyIndex,#1
 		cmp r5,#6
 		blt keyLoop$
 		
@@ -212,6 +214,7 @@ KeyboardGetChar:
 	mov r0,#0		
 keyboardGetCharReturn$:
 	pop {r4,r5,r6,pc}
-	.unreq kbd
+	.unreq keyAddr
+	.unreq keyIndex
 	.unreq key
 	
