@@ -30,11 +30,11 @@ terminalView:
 	.int terminalBuffer
 
 /*
-* terminalColour is the 8 bit color, with low 4 bits for fore color,
+* terminalColor is the 8 bit color, with low 4 bits for fore color,
 * and high 4 bits for background color.
 * C++: u32 terminalView;
 */
-terminalColour:
+terminalColor:
 	.byte 0xf
 
 /*
@@ -63,13 +63,13 @@ terminalScreen:
 /*
 * Sets the fore colour to the specified terminal colour. The low 4 bits of r0
 * contains the terminal colour code.
-* C++: void TerminalColour(u8 colour);
+* C++: void TerminalColor(u8 colour);
 */
-TerminalColour:
+TerminalColor:
 	teq r0,#6
 	/* #6 = brown */
 	ldreq r0,=0x02B5
-	beq SetForeColour
+	beq SetForeColor
 
 	/* bit 4: add 1/3 to RGB
      * bits 3-1: add 2/3 to respective RGB
@@ -85,7 +85,7 @@ TerminalColour:
 	tst r0,#0b0001
 	addne r1,#0xA800
 	mov r0,r1
-	b SetForeColour
+	b SetForeColor
 
 /*
 * Copies the currently displayed part of TerminalBuffer to the screen.
@@ -127,7 +127,7 @@ TerminalDisplay:
 			lsr col,char,#8
 			and char,#0x7f
 			lsr r0,col,#4
-			bl TerminalColour
+			bl TerminalColor
 
 			mov r0,#0x7f
 			mov r1,x
@@ -135,7 +135,7 @@ TerminalDisplay:
 			bl DrawCharacter
 
 			and r0,col,#0xf
-			bl TerminalColour
+			bl TerminalColor
 
 			mov r0,char
 			mov r1,x
@@ -172,11 +172,15 @@ TerminalDisplay:
 */
 .globl TerminalClear
 TerminalClear:
-	ldr r0,=terminalStart
-	add r1,r0,#terminalBuffer-terminalStart
-	str r1,[r0]
-	str r1,[r0,#terminalStop-terminalStart]
-	str r1,[r0,#terminalView-terminalStart]
+	start .req r0
+	clearval .req r1
+	ldr start,=terminalStart
+	add clearval,start,#terminalBuffer-terminalStart
+	str clearval,[start]
+	str clearval,[start,#terminalStop-terminalStart]
+	str clearval,[start,#terminalView-terminalStart]
+	.unreq start
+	.unreq clearval
 	mov pc,lr
 
 /*
@@ -230,7 +234,7 @@ Print:
 
 	charNormal$:
 		strb char,[bufferStop]
-		ldr r0,=terminalColour
+		ldr r0,=terminalColor
 		ldrb r0,[r0]
 		strb r0,[bufferStop,#1]
 		add bufferStop,#2

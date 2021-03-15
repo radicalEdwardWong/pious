@@ -27,12 +27,12 @@ font:
 	.incbin "font.bin"
 
 /*
-* SetForeColour changes the current drawing colour to the 16 bit colour in r0.
-* C++: void SetForeColour(u16 colour);
+k SetForeColor changes the current drawing colour to the 16 bit colour in r0.
+* C++: void SetForeColor(u16 colour);
 */
 .section .text
-.globl SetForeColour
-SetForeColour:
+.globl SetForeColor
+SetForeColor:
 	cmp r0,#0x10000
 	movhis pc,lr
 

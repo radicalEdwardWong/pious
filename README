@@ -1,6 +1,8 @@
-/****************************************************************
- * PIOUS - the most devout Raspberry PI Operating Ultra-System *
- ****************************************************************/
+/*****************************************************************
+ ***** PIOUS - the most devout raspPI Operating Ultra-System *****
+ *****************************************************************/
+
+Original source from: https://github.com/Chadderz121/bakingpi-www
 
 Commands: echo, reset, ok and cls
 
